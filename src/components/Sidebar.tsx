@@ -71,6 +71,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={true}
               className="group relative flex w-full flex-col items-center justify-center rounded-lg py-2.5 px-1 text-[11px] font-medium transition-colors duration-200"
             >
               {/* Active Sliding Pill Background */}
@@ -110,6 +111,7 @@ export default function Sidebar() {
         return (
           <Link
             href="/settings"
+            prefetch={true}
             className="group relative flex w-full flex-col items-center justify-center rounded-lg py-2.5 px-1 mt-auto text-[11px] font-medium transition-colors duration-200"
           >
             {isSettingsActive && (
