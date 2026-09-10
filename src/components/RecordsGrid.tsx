@@ -12,9 +12,6 @@ import {
 } from "ag-grid-community";
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import {
-  Eye,
-  Pencil,
-  Trash2,
   Search,
   FileSpreadsheet,
   Filter,
@@ -29,13 +26,25 @@ ModuleRegistry.registerModules([
   AllEnterpriseModule,
 ]);
 
-type Order = {
-  orderId: number;
-  customer: string;
-  product: string;
-  amount: number;
-  status: string;
+export type AuditRecord = {
+  id: string;
+  timestamp: string;
+  user: string;
+  action: string;
+  category: "Authentication" | "Data Export" | "System Update" | "Permission Change";
+  ipAddress: string;
+  status: "Success" | "Warning" | "Failed";
 };
+
+const initialRecords: AuditRecord[] = [
+  { id: "LOG-9001", timestamp: "2026-09-10 10:45:12", user: "sarah.admin@axiom.io", action: "Exported Monthly Sales CSV Report", category: "Data Export", ipAddress: "192.168.1.104", status: "Success" },
+  { id: "LOG-9002", timestamp: "2026-09-10 10:32:05", user: "system.bot", action: "Automated Nightly Database Backup Complete", category: "System Update", ipAddress: "10.0.4.12", status: "Success" },
+  { id: "LOG-9003", timestamp: "2026-09-10 09:14:50", user: "david.chen@xyz.com", action: "User Session Authenticated (2FA Verified)", category: "Authentication", ipAddress: "49.207.18.22", status: "Success" },
+  { id: "LOG-9004", timestamp: "2026-09-10 08:55:01", user: "unknown.user", action: "Failed Authentication Attempt (Invalid Password)", category: "Authentication", ipAddress: "185.220.101.5", status: "Warning" },
+  { id: "LOG-9005", timestamp: "2026-09-09 23:10:40", user: "sarah.admin@axiom.io", action: "Updated Role Permissions for VIP Customer Tier", category: "Permission Change", ipAddress: "192.168.1.104", status: "Success" },
+  { id: "LOG-9006", timestamp: "2026-09-09 18:22:15", user: "elena.r@pqr.io", action: "Bulk CSV Upload: Product Stock Quantities", category: "Data Export", ipAddress: "103.22.45.12", status: "Success" },
+  { id: "LOG-9007", timestamp: "2026-09-09 15:04:33", user: "system.bot", action: "AG Grid License Validation Heartbeat Executed", category: "System Update", ipAddress: "127.0.0.1", status: "Success" },
+];
 
 const gridTheme = themeQuartz.withParams({
   backgroundColor: "#ffffff",
@@ -44,76 +53,23 @@ const gridTheme = themeQuartz.withParams({
   headerTextColor: "#44403c",
 });
 
-const rowData: Order[] = [
-  { orderId: 1001, customer: "ABC Ltd", product: "Laptop", amount: 80000, status: "Completed" },
-  { orderId: 1002, customer: "XYZ Ltd", product: "Monitor", amount: 25000, status: "Pending" },
-  { orderId: 1003, customer: "PQR Ltd", product: "Keyboard", amount: 8000, status: "Completed" },
-  { orderId: 1004, customer: "LMN Ltd", product: "Mouse", amount: 2500, status: "Cancelled" },
-  { orderId: 1005, customer: "RST Ltd", product: "Laptop", amount: 95000, status: "Completed" },
-  { orderId: 1006, customer: "ABC Ltd", product: "Desk Chair", amount: 15000, status: "Pending" },
-  { orderId: 1007, customer: "Global Corp", product: "Monitor", amount: 32000, status: "Completed" },
-  { orderId: 1008, customer: "Tech Solutions", product: "Headphones", amount: 12000, status: "Processing" },
-  { orderId: 1009, customer: "XYZ Ltd", product: "Laptop", amount: 110000, status: "Completed" },
-  { orderId: 1010, customer: "PQR Ltd", product: "Docking Station", amount: 18000, status: "Pending" },
-  { orderId: 1011, customer: "Apex Inc", product: "Webcam", amount: 6500, status: "Completed" },
-  { orderId: 1012, customer: "LMN Ltd", product: "Keyboard", amount: 7500, status: "Processing" },
-  { orderId: 1013, customer: "Global Corp", product: "Laptop", amount: 88000, status: "Cancelled" },
-  { orderId: 1014, customer: "RST Ltd", product: "Monitor", amount: 27000, status: "Completed" },
-  { orderId: 1015, customer: "Tech Solutions", product: "Mouse", amount: 3000, status: "Completed" },
-];
-
-const ActionsCellRenderer = (params: { data?: Order }) => {
-  if (!params.data) return null;
-  return (
-    <div className="flex items-center justify-center gap-1.5 h-full w-full">
-      <button
-        onClick={() => alert(`Viewing Order #${params.data?.orderId}`)}
-        title="View Order"
-        className="p-1.5 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors cursor-pointer focus:outline-none"
-      >
-        <Eye className="w-3.5 h-3.5" />
-      </button>
-
-      <button
-        onClick={() => alert(`Editing Order #${params.data?.orderId}`)}
-        title="Edit Order"
-        className="p-1.5 text-amber-700 hover:text-amber-900 hover:bg-amber-50 rounded transition-colors cursor-pointer focus:outline-none"
-      >
-        <Pencil className="w-3.5 h-3.5" />
-      </button>
-
-      <button
-        onClick={() => alert(`Deleting Order #${params.data?.orderId}`)}
-        title="Delete Order"
-        className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors cursor-pointer focus:outline-none"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-      </button>
-    </div>
-  );
-};
-
-const StatusCellRenderer = (params: { data?: Order }) => {
+const StatusCellRenderer = (params: { data?: AuditRecord }) => {
   if (!params.data) return null;
   const status = params.data.status;
   return (
     <div className="flex items-center h-full">
       <span
         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 h-5 rounded-full text-[11px] font-medium border leading-none ${
-          status === "Completed"
+          status === "Success"
             ? "bg-emerald-50/90 text-emerald-700 border-emerald-200/80"
-            : status === "Pending" || status === "Processing"
+            : status === "Warning"
             ? "bg-amber-50/90 text-amber-700 border-amber-200/80"
             : "bg-rose-50/90 text-rose-700 border-rose-200/80"
         }`}
       >
         <span
           className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-            status === "Completed"
-              ? "bg-emerald-500"
-              : status === "Pending" || status === "Processing"
-              ? "bg-amber-500"
-              : "bg-rose-500"
+            status === "Success" ? "bg-emerald-500" : status === "Warning" ? "bg-amber-500" : "bg-rose-500"
           }`}
         />
         {status}
@@ -122,27 +78,52 @@ const StatusCellRenderer = (params: { data?: Order }) => {
   );
 };
 
-const columnDefs: ColDef<Order>[] = [
+const CategoryCellRenderer = (params: { data?: AuditRecord }) => {
+  if (!params.data) return null;
+  return (
+    <div className="flex items-center h-full">
+      <span className="inline-flex items-center px-2 py-0.5 h-5 rounded bg-stone-100 text-stone-700 font-medium text-[11px] border border-stone-200/80 leading-none">
+        {params.data.category}
+      </span>
+    </div>
+  );
+};
+
+const columnDefs: ColDef<AuditRecord>[] = [
   {
-    field: "orderId",
-    headerName: "Order ID",
+    field: "id",
+    headerName: "Log ID",
+    enableRowGroup: true,
+    cellClass: "font-mono font-semibold text-stone-900",
+  },
+  {
+    field: "timestamp",
+    headerName: "Timestamp",
+    enableRowGroup: true,
+    cellClass: "font-mono text-stone-500",
+  },
+  {
+    field: "user",
+    headerName: "User / Actor",
     enableRowGroup: true,
   },
   {
-    field: "customer",
-    headerName: "Customer",
+    field: "action",
+    headerName: "Action Summary",
     enableRowGroup: true,
+    minWidth: 220,
   },
   {
-    field: "product",
-    headerName: "Product",
+    field: "category",
+    headerName: "Category",
     enableRowGroup: true,
+    cellRenderer: CategoryCellRenderer,
   },
   {
-    field: "amount",
-    headerName: "Amount",
+    field: "ipAddress",
+    headerName: "IP Address",
     enableRowGroup: true,
-    valueFormatter: (params) => (params.value ? `₹${params.value.toLocaleString()}` : ""),
+    cellClass: "font-mono text-stone-500",
   },
   {
     field: "status",
@@ -150,18 +131,11 @@ const columnDefs: ColDef<Order>[] = [
     enableRowGroup: true,
     cellRenderer: StatusCellRenderer,
   },
-  {
-    colId: "actions",
-    headerName: "Actions",
-    headerClass: "[&_.ag-header-cell-label]:justify-center",
-    cellStyle: { display: "flex", justifyContent: "center", alignItems: "center" },
-    cellRenderer: ActionsCellRenderer,
-  },
 ];
 
-export default function OrdersGrid() {
+export default function RecordsGrid() {
   const [mounted, setMounted] = useState(false);
-  const [gridApi, setGridApi] = useState<GridApi<Order> | null>(null);
+  const [gridApi, setGridApi] = useState<GridApi<AuditRecord> | null>(null);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -169,7 +143,7 @@ export default function OrdersGrid() {
     setMounted(true);
   }, []);
 
-  const onGridReady = useCallback((params: GridReadyEvent<Order>) => {
+  const onGridReady = useCallback((params: GridReadyEvent<AuditRecord>) => {
     setGridApi(params.api);
   }, []);
 
@@ -203,7 +177,7 @@ export default function OrdersGrid() {
     setShowFilters(false);
   }, [gridApi]);
 
-  const defaultColDef = useMemo<ColDef<Order>>(
+  const defaultColDef = useMemo<ColDef<AuditRecord>>(
     () => ({
       flex: 1,
       enableRowGroup: true,
@@ -218,14 +192,14 @@ export default function OrdersGrid() {
 
   if (!mounted) {
     return (
-      <div className="h-[480px] w-full rounded-lg border border-stone-200 bg-white flex items-center justify-center text-xs text-stone-400">
-        Loading grid...
+      <div className="h-[460px] w-full rounded-lg border border-stone-200 bg-white flex items-center justify-center text-xs text-stone-400">
+        Loading records grid...
       </div>
     );
   }
 
   return (
-    <div className="relative h-[480px] w-full rounded-lg border border-stone-200/90 overflow-hidden shadow-2xs">
+    <div className="relative h-[460px] w-full rounded-lg border border-stone-200/90 overflow-hidden shadow-2xs">
       {/* Position Toolbar Controls directly inside the Row Group Drop Panel (right side) */}
       <div className="absolute top-1.5 right-2 z-10 flex flex-wrap items-center gap-2">
         {/* Quick Search Input */}
@@ -233,7 +207,7 @@ export default function OrdersGrid() {
           <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 pointer-events-none" />
           <input
             type="text"
-            placeholder="Quick search orders..."
+            placeholder="Quick search logs..."
             value={quickFilterText}
             onChange={(e) => setQuickFilterText(e.target.value)}
             className="pl-8 pr-3 py-1 text-xs border border-stone-300 focus:border-stone-800 rounded-md bg-white w-44 sm:w-56 outline-none transition-all shadow-2xs placeholder:text-stone-400 text-stone-800"
@@ -242,16 +216,14 @@ export default function OrdersGrid() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-1">
-          {/* Export CSV / Excel */}
           <button
             onClick={onExportCsv}
-            title="Export CSV / Excel"
+            title="Export CSV"
             className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
           </button>
 
-          {/* Toggle Column Floating Filters */}
           <button
             onClick={onToggleFilters}
             title={showFilters ? "Hide Column Filters" : "Show Column Filters"}
@@ -264,16 +236,14 @@ export default function OrdersGrid() {
             <Filter className="w-3.5 h-3.5" />
           </button>
 
-          {/* Auto-Fit / Resize Columns */}
           <button
             onClick={onFitColumns}
-            title="Auto-Fit Columns to Screen Width"
+            title="Auto-Fit Columns"
             className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
           >
             <Maximize2 className="w-3.5 h-3.5" />
           </button>
 
-          {/* Select All Rows */}
           <button
             onClick={onSelectAll}
             title="Select All Rows"
@@ -282,7 +252,6 @@ export default function OrdersGrid() {
             <CheckSquare className="w-3.5 h-3.5 text-stone-800" />
           </button>
 
-          {/* Deselect All Rows */}
           <button
             onClick={onDeselectAll}
             title="Deselect All Rows"
@@ -291,10 +260,9 @@ export default function OrdersGrid() {
             <Square className="w-3.5 h-3.5 text-stone-400" />
           </button>
 
-          {/* Reset Grid */}
           <button
             onClick={onResetGrid}
-            title="Reset Grid Filters & Columns"
+            title="Reset Grid"
             className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -302,9 +270,9 @@ export default function OrdersGrid() {
         </div>
       </div>
 
-      <AgGridReact<Order>
+      <AgGridReact<AuditRecord>
         theme={gridTheme}
-        rowData={rowData}
+        rowData={initialRecords}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         rowGroupPanelShow="always"
