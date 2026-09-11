@@ -1,7 +1,14 @@
 "use client";
 
-import RecordsGrid from "@/components/RecordsGrid";
+import dynamic from "next/dynamic";
 import { FileText, Download, ShieldCheck, Activity, Terminal } from "lucide-react";
+import GridSkeleton from "@/components/GridSkeleton";
+import GridErrorBoundary from "@/components/GridErrorBoundary";
+
+const RecordsGrid = dynamic(() => import("@/components/RecordsGrid"), {
+  loading: () => <GridSkeleton height="h-[460px]" rows={8} />,
+  ssr: false,
+});
 
 export default function RecordsPage() {
   return (
@@ -18,7 +25,6 @@ export default function RecordsPage() {
         </div>
 
         <button
-          onClick={() => alert("Downloading full audit log archive...")}
           className="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium rounded-lg transition-colors shadow-xs cursor-pointer"
         >
           <Download className="w-4 h-4" />
@@ -73,7 +79,9 @@ export default function RecordsPage() {
           </h2>
           <span className="text-xs text-stone-400">Drag column headers to group, search, and filter</span>
         </div>
-        <RecordsGrid />
+        <GridErrorBoundary fallbackTitle="Could not render Records Grid">
+          <RecordsGrid />
+        </GridErrorBoundary>
       </div>
     </div>
   );

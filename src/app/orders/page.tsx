@@ -1,7 +1,14 @@
 "use client";
 
-import OrdersGrid from "@/components/OrdersGrid";
+import dynamic from "next/dynamic";
 import { ShoppingCart, Clock, CheckCircle2, XCircle, ArrowUpRight } from "lucide-react";
+import GridSkeleton from "@/components/GridSkeleton";
+import GridErrorBoundary from "@/components/GridErrorBoundary";
+
+const OrdersGrid = dynamic(() => import("@/components/OrdersGrid"), {
+  loading: () => <GridSkeleton height="h-[480px]" rows={10} />,
+  ssr: false,
+});
 
 export default function OrdersPage() {
   return (
@@ -74,7 +81,9 @@ export default function OrdersPage() {
             </p>
           </div>
         </div>
-        <OrdersGrid />
+        <GridErrorBoundary fallbackTitle="Could not render Orders Grid">
+          <OrdersGrid />
+        </GridErrorBoundary>
       </div>
     </div>
   );

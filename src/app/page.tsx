@@ -1,5 +1,14 @@
-import OrdersGrid from "@/components/OrdersGrid";
+"use client";
+
+import dynamic from "next/dynamic";
 import { TrendingUp, Users, ShoppingBag, IndianRupee } from "lucide-react";
+import GridSkeleton from "@/components/GridSkeleton";
+import GridErrorBoundary from "@/components/GridErrorBoundary";
+
+const OrdersGrid = dynamic(() => import("@/components/OrdersGrid"), {
+  loading: () => <GridSkeleton height="h-[480px]" rows={10} />,
+  ssr: false,
+});
 
 export default function Home() {
   return (
@@ -95,7 +104,9 @@ export default function Home() {
               15 Total Records
             </span>
           </div>
-          <OrdersGrid />
+          <GridErrorBoundary fallbackTitle="Could not render Orders Grid">
+            <OrdersGrid />
+          </GridErrorBoundary>
         </div>
 
         {/* Recent Orders Side Panel */}

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   User,
@@ -18,8 +17,6 @@ import { saveCustomerApi } from "@/services/customerService";
 import { SaveCustomerRequest } from "@/types/customer";
 
 export default function AddCustomerPage() {
-  const router = useRouter();
-
   const [formData, setFormData] = useState<SaveCustomerRequest>({
     FName: "",
     Email: "",
@@ -59,11 +56,10 @@ export default function AddCustomerPage() {
       const msg = res.message || `Customer "${formData.FName}" saved successfully to database!`;
       setSuccessMessage(msg);
       
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to save customer to the database API. Check backend connection.";
       console.warn("API request failed:", err);
-      setErrorMessage(
-        err?.message || "Failed to save customer to the database API. Check backend connection."
-      );
+      setErrorMessage(msg);
     } finally {
       setSubmitting(false);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
   GridApi,
@@ -48,7 +48,7 @@ const gridTheme = themeQuartz.withParams({
   headerTextColor: "#44403c",
 });
 
-const CustomerCellRenderer = (params: { data?: Customer }) => {
+const CustomerCellRenderer = memo(function CustomerCellRenderer(params: { data?: Customer }) {
   if (!params.data) return null;
   const name = params.data.FName || params.data.name || "Customer";
   const email = params.data.Email || params.data.email || "";
@@ -70,12 +70,12 @@ const CustomerCellRenderer = (params: { data?: Customer }) => {
       </div>
     </div>
   );
-};
+});
 
-const TierCellRenderer = (params: { data?: Customer }) => {
+const TierCellRenderer = memo(function TierCellRenderer(params: { data?: Customer }) {
   if (!params.data) return null;
   const rawTier = (params.data.ATier || params.data.tier || "standard").toString().toLowerCase();
-  
+
   let label = "Standard";
   let badgeStyle = "bg-stone-100 text-stone-700 border-stone-200/80";
 
@@ -94,9 +94,9 @@ const TierCellRenderer = (params: { data?: Customer }) => {
       </span>
     </div>
   );
-};
+});
 
-const StatusCellRenderer = (params: { data?: Customer }) => {
+const StatusCellRenderer = memo(function StatusCellRenderer(params: { data?: Customer }) {
   if (!params.data) return null;
   const rawStatus = (params.data.Status || params.data.status || "Active").toString();
   const isActive = rawStatus.toLowerCase() === "active";
@@ -119,17 +119,16 @@ const StatusCellRenderer = (params: { data?: Customer }) => {
       </span>
     </div>
   );
-};
+});
 
-const CreatedAtCellRenderer = (params: { data?: Customer }) => {
+const CreatedAtCellRenderer = memo(function CreatedAtCellRenderer(params: { data?: Customer }) {
   if (!params.data || !params.data.CreatedAt) return <span className="text-stone-400 text-xs">-</span>;
-  try {
-    const date = new Date(params.data.CreatedAt);
-    return <span className="text-xs text-stone-600">{date.toLocaleDateString()}</span>;
-  } catch {
-    return <span className="text-xs text-stone-600">{params.data.CreatedAt}</span>;
-  }
-};
+  const rawDate = params.data.CreatedAt;
+  const parsedDate = new Date(rawDate);
+  const formattedDate = isNaN(parsedDate.getTime()) ? String(rawDate) : parsedDate.toLocaleDateString();
+
+  return <span className="text-xs text-stone-600">{formattedDate}</span>;
+});
 
 interface ActionsCellRendererProps {
   data?: Customer;
@@ -137,7 +136,7 @@ interface ActionsCellRendererProps {
   onDeleteCustomer?: (customer: Customer) => void;
 }
 
-const ActionsCellRenderer = (params: ActionsCellRendererProps) => {
+const ActionsCellRenderer = memo(function ActionsCellRenderer(params: ActionsCellRendererProps) {
   if (!params.data) return null;
   const customer = params.data;
 
@@ -160,14 +159,13 @@ const ActionsCellRenderer = (params: ActionsCellRendererProps) => {
       </button>
     </div>
   );
-};
+});
 
 export default function CustomersGrid() {
-  const [mounted, setMounted] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi<Customer> | null>(null);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // API State
   const [rowData, setRowData] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -191,17 +189,13 @@ export default function CustomersGrid() {
   const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Fetch live database customer list on page load
-  const loadCustomerData = useCallback(async () => {
+  // Fetch live database customer list on mount
+  const fetchCustomerData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await getCustomersApi();
-      
+
       if (Array.isArray(data) && data.length > 0) {
         setRowData(data);
         setIsLiveApi(true);
@@ -209,9 +203,10 @@ export default function CustomersGrid() {
         setRowData([]);
         setIsLiveApi(true);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Could not reach database API";
       console.warn("Backend API request error:", err);
-      setError(err?.message || "Could not reach database API");
+      setError(msg);
       setIsLiveApi(false);
     } finally {
       setLoading(false);
@@ -219,10 +214,34 @@ export default function CustomersGrid() {
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      loadCustomerData();
-    }
-  }, [mounted, loadCustomerData]);
+    let active = true;
+    getCustomersApi()
+      .then((data) => {
+        if (!active) return;
+        if (Array.isArray(data) && data.length > 0) {
+          setRowData(data);
+          setIsLiveApi(true);
+        } else {
+          setRowData([]);
+          setIsLiveApi(true);
+        }
+        setError(null);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        const msg = err instanceof Error ? err.message : "Could not reach database API";
+        console.warn("Backend API request error:", err);
+        setError(msg);
+        setIsLiveApi(false);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Handle Edit Click
   const handleEditCustomer = useCallback((customer: Customer) => {
@@ -268,14 +287,15 @@ export default function CustomersGrid() {
       const res = await updateCustomerApi(customerId, editFormData);
       setEditSuccessMsg(res.message || `Customer updated successfully!`);
 
-      await loadCustomerData();
+      await fetchCustomerData();
 
       setTimeout(() => {
         setEditingCustomer(null);
       }, 1200);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to update customer.";
       console.error("Update customer error:", err);
-      setEditErrorMsg(err?.message || "Failed to update customer.");
+      setEditErrorMsg(msg);
     } finally {
       setUpdating(false);
     }
@@ -290,11 +310,12 @@ export default function CustomersGrid() {
     try {
       setDeleting(true);
       await deleteCustomerApi(customerId);
-      await loadCustomerData();
+      await fetchCustomerData();
       setDeletingCustomer(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to delete customer.";
       console.error("Delete customer error:", err);
-      alert(err?.message || "Failed to delete customer.");
+      alert(msg);
     } finally {
       setDeleting(false);
     }
@@ -417,14 +438,6 @@ export default function CustomersGrid() {
 
   const rowSelection = useMemo(() => ({ mode: "multiRow" as const }), []);
 
-  if (!mounted) {
-    return (
-      <div className="h-[460px] w-full rounded-lg border border-stone-200 bg-white flex items-center justify-center text-xs text-stone-400">
-        Loading customers grid...
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-2">
       {/* Live API Status / Error Info Banner */}
@@ -436,7 +449,7 @@ export default function CustomersGrid() {
               : "bg-amber-50 text-amber-800 border border-amber-200"
           }`}>
             <Server className="w-3 h-3" />
-            {isLiveApi ? "Connected to ASP.NET Core Database API (localhost:5144)" : "API Disconnected"}
+            {isLiveApi ? "Connected to ASP.NET Core Database API (ports 5144 / 8081)" : "API Disconnected"}
           </span>
           {error && (
             <span className="text-rose-600 flex items-center gap-1 text-[11px]">
@@ -447,7 +460,7 @@ export default function CustomersGrid() {
         </div>
 
         <button
-          onClick={loadCustomerData}
+          onClick={fetchCustomerData}
           disabled={loading}
           className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 px-2 py-1 rounded transition-colors cursor-pointer disabled:opacity-50"
           title="Reload Data from API"
@@ -539,6 +552,9 @@ export default function CustomersGrid() {
           onGridReady={onGridReady}
           rowSelection={rowSelection}
           loading={loading}
+          pagination={true}
+          paginationPageSize={15}
+          paginationPageSizeSelector={[10, 15, 25, 50]}
         />
       </div>
 

@@ -5,8 +5,9 @@ import { ApiResponse } from "@/types/api";
 /**
  * Fetch customer list from ASP.NET Core database API GET /api/Demo/customers
  */
-export async function getCustomersApi(): Promise<Customer[]> {
-  const response = await apiFetch<ApiResponse<Customer>>("/Demo/customers", {
+export async function getCustomersApi(params?: { page?: number; pageSize?: number }): Promise<Customer[]> {
+  const query = params?.page ? `?page=${params.page}&pageSize=${params.pageSize || 50}` : "";
+  const response = await apiFetch<ApiResponse<Customer>>(`/Demo/customers${query}`, {
     method: "GET",
   });
 

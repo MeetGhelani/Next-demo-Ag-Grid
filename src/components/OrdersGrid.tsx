@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, memo } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
   GridApi,
@@ -44,7 +44,7 @@ const gridTheme = themeQuartz.withParams({
   headerTextColor: "#44403c",
 });
 
-const rowData: Order[] = [
+const initialOrders: Order[] = [
   { orderId: 1001, customer: "ABC Ltd", product: "Laptop", amount: 80000, status: "Completed" },
   { orderId: 1002, customer: "XYZ Ltd", product: "Monitor", amount: 25000, status: "Pending" },
   { orderId: 1003, customer: "PQR Ltd", product: "Keyboard", amount: 8000, status: "Completed" },
@@ -62,7 +62,7 @@ const rowData: Order[] = [
   { orderId: 1015, customer: "Tech Solutions", product: "Mouse", amount: 3000, status: "Completed" },
 ];
 
-const ActionsCellRenderer = (params: { data?: Order }) => {
+const ActionsCellRenderer = memo(function ActionsCellRenderer(params: { data?: Order }) {
   if (!params.data) return null;
   return (
     <div className="flex items-center justify-center gap-1.5 h-full w-full">
@@ -91,9 +91,9 @@ const ActionsCellRenderer = (params: { data?: Order }) => {
       </button>
     </div>
   );
-};
+});
 
-const StatusCellRenderer = (params: { data?: Order }) => {
+const StatusCellRenderer = memo(function StatusCellRenderer(params: { data?: Order }) {
   if (!params.data) return null;
   const status = params.data.status;
   return (
@@ -120,54 +120,12 @@ const StatusCellRenderer = (params: { data?: Order }) => {
       </span>
     </div>
   );
-};
-
-const columnDefs: ColDef<Order>[] = [
-  {
-    field: "orderId",
-    headerName: "Order ID",
-    enableRowGroup: true,
-  },
-  {
-    field: "customer",
-    headerName: "Customer",
-    enableRowGroup: true,
-  },
-  {
-    field: "product",
-    headerName: "Product",
-    enableRowGroup: true,
-  },
-  {
-    field: "amount",
-    headerName: "Amount",
-    enableRowGroup: true,
-    valueFormatter: (params) => (params.value ? `₹${params.value.toLocaleString()}` : ""),
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    enableRowGroup: true,
-    cellRenderer: StatusCellRenderer,
-  },
-  {
-    colId: "actions",
-    headerName: "Actions",
-    headerClass: "[&_.ag-header-cell-label]:justify-center",
-    cellStyle: { display: "flex", justifyContent: "center", alignItems: "center" },
-    cellRenderer: ActionsCellRenderer,
-  },
-];
+});
 
 export default function OrdersGrid() {
-  const [mounted, setMounted] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi<Order> | null>(null);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const onGridReady = useCallback((params: GridReadyEvent<Order>) => {
     setGridApi(params.api);
@@ -203,6 +161,46 @@ export default function OrdersGrid() {
     setShowFilters(false);
   }, [gridApi]);
 
+  const columnDefs = useMemo<ColDef<Order>[]>(
+    () => [
+      {
+        field: "orderId",
+        headerName: "Order ID",
+        enableRowGroup: true,
+      },
+      {
+        field: "customer",
+        headerName: "Customer",
+        enableRowGroup: true,
+      },
+      {
+        field: "product",
+        headerName: "Product",
+        enableRowGroup: true,
+      },
+      {
+        field: "amount",
+        headerName: "Amount",
+        enableRowGroup: true,
+        valueFormatter: (params) => (params.value ? `₹${params.value.toLocaleString()}` : ""),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        enableRowGroup: true,
+        cellRenderer: StatusCellRenderer,
+      },
+      {
+        colId: "actions",
+        headerName: "Actions",
+        headerClass: "[&_.ag-header-cell-label]:justify-center",
+        cellStyle: { display: "flex", justifyContent: "center", alignItems: "center" },
+        cellRenderer: ActionsCellRenderer,
+      },
+    ],
+    []
+  );
+
   const defaultColDef = useMemo<ColDef<Order>>(
     () => ({
       flex: 1,
@@ -215,14 +213,6 @@ export default function OrdersGrid() {
   );
 
   const rowSelection = useMemo(() => ({ mode: "multiRow" as const }), []);
-
-  if (!mounted) {
-    return (
-      <div className="h-[480px] w-full rounded-lg border border-stone-200 bg-white flex items-center justify-center text-xs text-stone-400">
-        Loading grid...
-      </div>
-    );
-  }
 
   return (
     <div className="relative h-[480px] w-full rounded-lg border border-stone-200/90 overflow-hidden shadow-2xs">
@@ -304,13 +294,16 @@ export default function OrdersGrid() {
 
       <AgGridReact<Order>
         theme={gridTheme}
-        rowData={rowData}
+        rowData={initialOrders}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         rowGroupPanelShow="always"
         quickFilterText={quickFilterText || undefined}
         onGridReady={onGridReady}
         rowSelection={rowSelection}
+        pagination={true}
+        paginationPageSize={15}
+        paginationPageSizeSelector={[10, 15, 25, 50]}
       />
     </div>
   );

@@ -1,7 +1,14 @@
 "use client";
 
-import ProductsGrid from "@/components/ProductsGrid";
-import { Package, Plus, Layers, AlertTriangle, CheckCircle2, Box } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Plus, Layers, AlertTriangle, CheckCircle2, Box } from "lucide-react";
+import GridSkeleton from "@/components/GridSkeleton";
+import GridErrorBoundary from "@/components/GridErrorBoundary";
+
+const ProductsGrid = dynamic(() => import("@/components/ProductsGrid"), {
+  loading: () => <GridSkeleton height="h-[460px]" rows={8} />,
+  ssr: false,
+});
 
 export default function ProductsPage() {
   return (
@@ -70,7 +77,9 @@ export default function ProductsPage() {
           </h2>
           <span className="text-xs text-stone-400">Drag column headers to group, search, and filter</span>
         </div>
-        <ProductsGrid />
+        <GridErrorBoundary fallbackTitle="Could not render Products Grid">
+          <ProductsGrid />
+        </GridErrorBoundary>
       </div>
     </div>
   );

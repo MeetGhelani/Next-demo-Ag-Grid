@@ -1,8 +1,15 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import CustomersGrid from "@/components/CustomersGrid";
 import { Users, Plus, UserCheck, ShieldAlert, Award } from "lucide-react";
+import GridSkeleton from "@/components/GridSkeleton";
+import GridErrorBoundary from "@/components/GridErrorBoundary";
+
+const CustomersGrid = dynamic(() => import("@/components/CustomersGrid"), {
+  loading: () => <GridSkeleton height="h-[460px]" rows={8} />,
+  ssr: false,
+});
 
 export default function CustomersPage() {
   return (
@@ -75,7 +82,9 @@ export default function CustomersPage() {
           </h2>
           <span className="text-xs text-stone-400">Drag column headers to group, search, and filter</span>
         </div>
-        <CustomersGrid />
+        <GridErrorBoundary fallbackTitle="Could not render Customers Grid">
+          <CustomersGrid />
+        </GridErrorBoundary>
       </div>
     </div>
   );

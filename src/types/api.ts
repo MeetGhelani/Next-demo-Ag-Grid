@@ -1,4 +1,4 @@
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   isValidUser?: boolean;
   messageType?: number;
   message?: string;
@@ -8,4 +8,3 @@ export interface ApiResponse<T = any> {
   errors?: string[];
   statusCode?: number;
 }
-

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, memo } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
   GridApi,
@@ -54,7 +54,7 @@ const gridTheme = themeQuartz.withParams({
   headerTextColor: "#44403c",
 });
 
-const StockCellRenderer = (params: { data?: Product }) => {
+const StockCellRenderer = memo(function StockCellRenderer(params: { data?: Product }) {
   if (!params.data) return null;
   const stock = params.data.stock;
   return (
@@ -70,9 +70,9 @@ const StockCellRenderer = (params: { data?: Product }) => {
       <span className="font-medium text-stone-700 text-xs">{stock} units</span>
     </div>
   );
-};
+});
 
-const CategoryCellRenderer = (params: { data?: Product }) => {
+const CategoryCellRenderer = memo(function CategoryCellRenderer(params: { data?: Product }) {
   if (!params.data) return null;
   return (
     <div className="flex items-center h-full">
@@ -81,9 +81,9 @@ const CategoryCellRenderer = (params: { data?: Product }) => {
       </span>
     </div>
   );
-};
+});
 
-const StatusCellRenderer = (params: { data?: Product }) => {
+const StatusCellRenderer = memo(function StatusCellRenderer(params: { data?: Product }) {
   if (!params.data) return null;
   const status = params.data.status;
   return (
@@ -106,9 +106,9 @@ const StatusCellRenderer = (params: { data?: Product }) => {
       </span>
     </div>
   );
-};
+});
 
-const ActionsCellRenderer = (params: { data?: Product }) => {
+const ActionsCellRenderer = memo(function ActionsCellRenderer(params: { data?: Product }) {
   if (!params.data) return null;
   return (
     <div className="flex items-center justify-center h-full w-full">
@@ -120,63 +120,12 @@ const ActionsCellRenderer = (params: { data?: Product }) => {
       </button>
     </div>
   );
-};
-
-const columnDefs: ColDef<Product>[] = [
-  {
-    field: "sku",
-    headerName: "SKU",
-    enableRowGroup: true,
-  },
-  {
-    field: "name",
-    headerName: "Product Name",
-    enableRowGroup: true,
-    minWidth: 200,
-  },
-  {
-    field: "category",
-    headerName: "Category",
-    enableRowGroup: true,
-    cellRenderer: CategoryCellRenderer,
-  },
-  {
-    field: "price",
-    headerName: "Unit Price",
-    enableRowGroup: true,
-    valueFormatter: (params) => (params.value ? `₹${params.value.toLocaleString()}` : ""),
-  },
-  {
-    field: "stock",
-    headerName: "Stock Level",
-    enableRowGroup: true,
-    cellRenderer: StockCellRenderer,
-    minWidth: 180,
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    enableRowGroup: true,
-    cellRenderer: StatusCellRenderer,
-  },
-  {
-    colId: "actions",
-    headerName: "Actions",
-    headerClass: "[&_.ag-header-cell-label]:justify-center",
-    cellStyle: { display: "flex", justifyContent: "center", alignItems: "center" },
-    cellRenderer: ActionsCellRenderer,
-  },
-];
+});
 
 export default function ProductsGrid() {
-  const [mounted, setMounted] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi<Product> | null>(null);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const onGridReady = useCallback((params: GridReadyEvent<Product>) => {
     setGridApi(params.api);
@@ -212,6 +161,55 @@ export default function ProductsGrid() {
     setShowFilters(false);
   }, [gridApi]);
 
+  const columnDefs = useMemo<ColDef<Product>[]>(
+    () => [
+      {
+        field: "sku",
+        headerName: "SKU",
+        enableRowGroup: true,
+      },
+      {
+        field: "name",
+        headerName: "Product Name",
+        enableRowGroup: true,
+        minWidth: 200,
+      },
+      {
+        field: "category",
+        headerName: "Category",
+        enableRowGroup: true,
+        cellRenderer: CategoryCellRenderer,
+      },
+      {
+        field: "price",
+        headerName: "Unit Price",
+        enableRowGroup: true,
+        valueFormatter: (params) => (params.value ? `₹${params.value.toLocaleString()}` : ""),
+      },
+      {
+        field: "stock",
+        headerName: "Stock Level",
+        enableRowGroup: true,
+        cellRenderer: StockCellRenderer,
+        minWidth: 180,
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        enableRowGroup: true,
+        cellRenderer: StatusCellRenderer,
+      },
+      {
+        colId: "actions",
+        headerName: "Actions",
+        headerClass: "[&_.ag-header-cell-label]:justify-center",
+        cellStyle: { display: "flex", justifyContent: "center", alignItems: "center" },
+        cellRenderer: ActionsCellRenderer,
+      },
+    ],
+    []
+  );
+
   const defaultColDef = useMemo<ColDef<Product>>(
     () => ({
       flex: 1,
@@ -224,14 +222,6 @@ export default function ProductsGrid() {
   );
 
   const rowSelection = useMemo(() => ({ mode: "multiRow" as const }), []);
-
-  if (!mounted) {
-    return (
-      <div className="h-[460px] w-full rounded-lg border border-stone-200 bg-white flex items-center justify-center text-xs text-stone-400">
-        Loading products grid...
-      </div>
-    );
-  }
 
   return (
     <div className="relative h-[460px] w-full rounded-lg border border-stone-200/90 overflow-hidden shadow-2xs">
@@ -314,6 +304,9 @@ export default function ProductsGrid() {
         quickFilterText={quickFilterText || undefined}
         onGridReady={onGridReady}
         rowSelection={rowSelection}
+        pagination={true}
+        paginationPageSize={15}
+        paginationPageSizeSelector={[10, 15, 25, 50]}
       />
     </div>
   );

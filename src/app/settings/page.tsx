@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Settings, User, Lock, Bell, Key, Save, Check } from "lucide-react";
+import { User, Lock, Bell, Key, Save, Check } from "lucide-react";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<"general" | "security" | "notifications" | "api">("general");

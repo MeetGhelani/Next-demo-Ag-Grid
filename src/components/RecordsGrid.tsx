@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, memo } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
   GridApi,
@@ -53,7 +53,7 @@ const gridTheme = themeQuartz.withParams({
   headerTextColor: "#44403c",
 });
 
-const StatusCellRenderer = (params: { data?: AuditRecord }) => {
+const StatusCellRenderer = memo(function StatusCellRenderer(params: { data?: AuditRecord }) {
   if (!params.data) return null;
   const status = params.data.status;
   return (
@@ -76,9 +76,9 @@ const StatusCellRenderer = (params: { data?: AuditRecord }) => {
       </span>
     </div>
   );
-};
+});
 
-const CategoryCellRenderer = (params: { data?: AuditRecord }) => {
+const CategoryCellRenderer = memo(function CategoryCellRenderer(params: { data?: AuditRecord }) {
   if (!params.data) return null;
   return (
     <div className="flex items-center h-full">
@@ -87,61 +87,12 @@ const CategoryCellRenderer = (params: { data?: AuditRecord }) => {
       </span>
     </div>
   );
-};
-
-const columnDefs: ColDef<AuditRecord>[] = [
-  {
-    field: "id",
-    headerName: "Log ID",
-    enableRowGroup: true,
-    cellClass: "font-mono font-semibold text-stone-900",
-  },
-  {
-    field: "timestamp",
-    headerName: "Timestamp",
-    enableRowGroup: true,
-    cellClass: "font-mono text-stone-500",
-  },
-  {
-    field: "user",
-    headerName: "User / Actor",
-    enableRowGroup: true,
-  },
-  {
-    field: "action",
-    headerName: "Action Summary",
-    enableRowGroup: true,
-    minWidth: 220,
-  },
-  {
-    field: "category",
-    headerName: "Category",
-    enableRowGroup: true,
-    cellRenderer: CategoryCellRenderer,
-  },
-  {
-    field: "ipAddress",
-    headerName: "IP Address",
-    enableRowGroup: true,
-    cellClass: "font-mono text-stone-500",
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    enableRowGroup: true,
-    cellRenderer: StatusCellRenderer,
-  },
-];
+});
 
 export default function RecordsGrid() {
-  const [mounted, setMounted] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi<AuditRecord> | null>(null);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const onGridReady = useCallback((params: GridReadyEvent<AuditRecord>) => {
     setGridApi(params.api);
@@ -177,6 +128,53 @@ export default function RecordsGrid() {
     setShowFilters(false);
   }, [gridApi]);
 
+  const columnDefs = useMemo<ColDef<AuditRecord>[]>(
+    () => [
+      {
+        field: "id",
+        headerName: "Log ID",
+        enableRowGroup: true,
+        cellClass: "font-mono font-semibold text-stone-900",
+      },
+      {
+        field: "timestamp",
+        headerName: "Timestamp",
+        enableRowGroup: true,
+        cellClass: "font-mono text-stone-500",
+      },
+      {
+        field: "user",
+        headerName: "User / Actor",
+        enableRowGroup: true,
+      },
+      {
+        field: "action",
+        headerName: "Action Summary",
+        enableRowGroup: true,
+        minWidth: 220,
+      },
+      {
+        field: "category",
+        headerName: "Category",
+        enableRowGroup: true,
+        cellRenderer: CategoryCellRenderer,
+      },
+      {
+        field: "ipAddress",
+        headerName: "IP Address",
+        enableRowGroup: true,
+        cellClass: "font-mono text-stone-500",
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        enableRowGroup: true,
+        cellRenderer: StatusCellRenderer,
+      },
+    ],
+    []
+  );
+
   const defaultColDef = useMemo<ColDef<AuditRecord>>(
     () => ({
       flex: 1,
@@ -189,14 +187,6 @@ export default function RecordsGrid() {
   );
 
   const rowSelection = useMemo(() => ({ mode: "multiRow" as const }), []);
-
-  if (!mounted) {
-    return (
-      <div className="h-[460px] w-full rounded-lg border border-stone-200 bg-white flex items-center justify-center text-xs text-stone-400">
-        Loading records grid...
-      </div>
-    );
-  }
 
   return (
     <div className="relative h-[460px] w-full rounded-lg border border-stone-200/90 overflow-hidden shadow-2xs">
@@ -279,6 +269,9 @@ export default function RecordsGrid() {
         quickFilterText={quickFilterText || undefined}
         onGridReady={onGridReady}
         rowSelection={rowSelection}
+        pagination={true}
+        paginationPageSize={15}
+        paginationPageSizeSelector={[10, 15, 25, 50]}
       />
     </div>
   );
