@@ -38,13 +38,20 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 flex items-center justify-center bg-[#181716] rounded-xl overflow-hidden shadow-xs group-hover:scale-105 transition-transform p-1.5">
+            <div className="w-10 h-10 flex items-center justify-center bg-[#181716] dark:bg-[#fafafa] rounded-xl overflow-hidden shadow-xs group-hover:scale-105 transition-transform p-1.5">
               <Image
                 src="/logo.png"
                 alt="Axiom Logo"
                 width={40}
                 height={40}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain dark:hidden"
+              />
+              <Image
+                src="/logo-black.png"
+                alt="Axiom Logo Dark"
+                width={40}
+                height={40}
+                className="w-full h-full object-contain hidden dark:block"
               />
             </div>
             <span className="font-display text-lg font-semibold tracking-wider uppercase text-[#181716]">
@@ -357,13 +364,20 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 flex items-center justify-center bg-[#181716] rounded-lg overflow-hidden p-1">
+                <div className="w-8 h-8 flex items-center justify-center bg-[#181716] dark:bg-[#fafafa] rounded-lg overflow-hidden p-1">
                   <Image
-                    src="/logo-s.png"
+                    src="/logo.png"
                     alt="Axiom Logo"
                     width={32}
                     height={32}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain dark:hidden"
+                  />
+                  <Image
+                    src="/logo-black.png"
+                    alt="Axiom Logo Dark"
+                    width={32}
+                    height={32}
+                    className="w-full h-full object-contain hidden dark:block"
                   />
                 </div>
                 <span className="font-display text-lg font-semibold tracking-wider uppercase text-[#181716]">

@@ -68,12 +68,21 @@ export default function Sidebar() {
           whileTap={{ scale: 0.94 }}
           className="w-11 h-11 flex items-center justify-center rounded-xl overflow-hidden bg-[#181716] dark:bg-[#fafafa] shadow-xs cursor-pointer p-1.5"
         >
+          {/* Light Mode Logo */}
           <Image
             src="/logo.png"
             alt="Axiom Logo"
             width={44}
             height={44}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain dark:hidden"
+          />
+          {/* Dark Mode Logo */}
+          <Image
+            src="/logo-black.png"
+            alt="Axiom Logo Dark"
+            width={44}
+            height={44}
+            className="w-full h-full object-contain hidden dark:block"
           />
         </motion.div>
         <h1 className="text-sm font-semibold tracking-wider uppercase text-[#181716] dark:text-[#fafafa]">
