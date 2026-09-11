@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import CustomersGrid from "@/components/CustomersGrid";
 import { Users, Plus, UserCheck, ShieldAlert, Award } from "lucide-react";
 
@@ -17,10 +18,14 @@ export default function CustomersPage() {
           </p>
         </div>
 
-        <button className="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium rounded-lg transition-colors shadow-xs cursor-pointer">
+        <Link
+          href="/customers/add-customer"
+          prefetch={true}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium rounded-lg transition-colors shadow-xs cursor-pointer"
+        >
           <Plus className="w-4 h-4" />
           <span>Add Customer</span>
-        </button>
+        </Link>
       </div>
 
       {/* KPI Cards */}

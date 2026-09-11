@@ -37,7 +37,7 @@ export type Product = {
 };
 
 const initialProducts: Product[] = [
-  { sku: "PRD-001", name: "Pro Laptop 15-inch", category: "Hardware", price: 95000, stock: 42, status: "In Stock" },
+  { sku: "PRD-001", name: "Pro Laptop 15-inch", category: "Hardware", price: 95000, stock: 30, status: "In Stock" },
   { sku: "PRD-002", name: "UltraWide 4K Monitor 32\"", category: "Hardware", price: 32000, stock: 18, status: "In Stock" },
   { sku: "PRD-003", name: "Mechanical RGB Keyboard", category: "Peripherals", price: 8000, stock: 5, status: "Low Stock" },
   { sku: "PRD-004", name: "Ergonomic Wireless Mouse", category: "Peripherals", price: 2500, stock: 85, status: "In Stock" },

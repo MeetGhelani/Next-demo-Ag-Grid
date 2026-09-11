@@ -40,8 +40,15 @@ const menuItems = [
   },
 ];
 
+const normalizePath = (path: string | null) => {
+  if (!path) return "/";
+  if (path === "/") return "/";
+  return path.endsWith("/") ? path.slice(0, -1) : path;
+};
+
 export default function Sidebar() {
   const pathname = usePathname();
+  const currentPath = normalizePath(pathname);
 
   return (
     <aside className="flex min-h-screen w-28 flex-col items-center border-r border-stone-200/80 bg-white px-3 py-6 shadow-[1px_0_4px_rgba(0,0,0,0.02)] select-none">
@@ -65,7 +72,11 @@ export default function Sidebar() {
       <nav className="flex w-full flex-col items-center gap-1.5">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const itemPath = normalizePath(item.href);
+          const isActive =
+            item.href === "/"
+              ? currentPath === "/"
+              : currentPath === itemPath || currentPath.startsWith(`${itemPath}/`);
 
           return (
             <Link
@@ -107,7 +118,7 @@ export default function Sidebar() {
 
       {/* Bottom Settings Link */}
       {(() => {
-        const isSettingsActive = pathname === "/settings";
+        const isSettingsActive = currentPath === "/settings" || currentPath.startsWith("/settings/");
         return (
           <Link
             href="/settings"
