@@ -35,18 +35,12 @@ import {
 } from "lucide-react";
 import { getCustomersApi, updateCustomerApi, deleteCustomerApi } from "@/services/customerService";
 import { Customer } from "@/types/customer";
+import { useTheme } from "@/context/ThemeContext";
 
 ModuleRegistry.registerModules([
   AllCommunityModule,
   AllEnterpriseModule,
 ]);
-
-const gridTheme = themeQuartz.withParams({
-  backgroundColor: "#ffffff",
-  borderColor: "#e7e5e4",
-  headerBackgroundColor: "#f5f5f4",
-  headerTextColor: "#44403c",
-});
 
 const CustomerCellRenderer = memo(function CustomerCellRenderer(params: { data?: Customer }) {
   if (!params.data) return null;
@@ -61,12 +55,12 @@ const CustomerCellRenderer = memo(function CustomerCellRenderer(params: { data?:
 
   return (
     <div className="flex items-center gap-2.5 h-full">
-      <div className="w-7 h-7 rounded-full bg-stone-900 text-white font-semibold flex items-center justify-center text-[10px] flex-shrink-0">
+      <div className="w-7 h-7 rounded-full bg-[#181716] dark:bg-[#fafafa] text-[#fbfaf7] dark:text-[#121215] font-semibold flex items-center justify-center text-[10px] flex-shrink-0 shadow-2xs">
         {initials}
       </div>
       <div className="truncate leading-tight">
-        <p className="font-semibold text-stone-900 text-xs">{name}</p>
-        <p className="text-[10px] text-stone-400 truncate">{email}</p>
+        <p className="font-semibold text-[#181716] dark:text-[#fafafa] text-xs">{name}</p>
+        <p className="text-[10px] text-[#78756e] dark:text-[#a1a1aa] truncate">{email}</p>
       </div>
     </div>
   );
@@ -77,19 +71,19 @@ const TierCellRenderer = memo(function TierCellRenderer(params: { data?: Custome
   const rawTier = (params.data.ATier || params.data.tier || "standard").toString().toLowerCase();
 
   let label = "Standard";
-  let badgeStyle = "bg-stone-100 text-stone-700 border-stone-200/80";
+  let badgeStyle = "bg-[#f4f2ea] dark:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border-[#dcd8ce] dark:border-[#3f3f46] font-semibold";
 
   if (rawTier.includes("vip")) {
     label = "VIP";
-    badgeStyle = "bg-amber-50 text-amber-800 border-amber-200/80 font-semibold";
+    badgeStyle = "bg-amber-100 dark:bg-amber-950/80 text-amber-950 dark:text-amber-300 border-amber-300/90 dark:border-amber-800/80 font-bold shadow-2xs";
   } else if (rawTier.includes("enterprise")) {
     label = "Enterprise";
-    badgeStyle = "bg-stone-900 text-stone-100 border-stone-800 font-semibold";
+    badgeStyle = "bg-[#181716] dark:bg-[#fafafa] text-[#fbfaf7] dark:text-[#121215] border-[#181716] dark:border-[#fafafa] font-bold shadow-2xs";
   }
 
   return (
     <div className="flex items-center h-full">
-      <span className={`inline-flex items-center px-2.5 py-0.5 h-5 rounded-md text-[11px] font-medium border leading-none ${badgeStyle}`}>
+      <span className={`inline-flex items-center px-2.5 py-0.5 h-5.5 rounded-md text-[11px] border leading-none ${badgeStyle}`}>
         {label}
       </span>
     </div>
@@ -104,10 +98,10 @@ const StatusCellRenderer = memo(function StatusCellRenderer(params: { data?: Cus
   return (
     <div className="flex items-center h-full">
       <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 h-5 rounded-full text-[11px] font-medium border leading-none ${
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 h-5.5 rounded-full text-[11px] font-semibold border leading-none shadow-2xs ${
           isActive
-            ? "bg-emerald-50/90 text-emerald-700 border-emerald-200/80"
-            : "bg-stone-100/90 text-stone-600 border-stone-200/80"
+            ? "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 border-emerald-300/80 dark:border-emerald-800/80"
+            : "bg-stone-100 dark:bg-stone-900 text-stone-700 dark:text-stone-300 border-stone-300/80 dark:border-stone-800"
         }`}
       >
         <span
@@ -122,12 +116,12 @@ const StatusCellRenderer = memo(function StatusCellRenderer(params: { data?: Cus
 });
 
 const CreatedAtCellRenderer = memo(function CreatedAtCellRenderer(params: { data?: Customer }) {
-  if (!params.data || !params.data.CreatedAt) return <span className="text-stone-400 text-xs">-</span>;
+  if (!params.data || !params.data.CreatedAt) return <span className="text-[#78756e] dark:text-[#a1a1aa] text-xs">-</span>;
   const rawDate = params.data.CreatedAt;
   const parsedDate = new Date(rawDate);
   const formattedDate = isNaN(parsedDate.getTime()) ? String(rawDate) : parsedDate.toLocaleDateString();
 
-  return <span className="text-xs text-stone-600">{formattedDate}</span>;
+  return <span className="text-xs font-medium text-[#181716] dark:text-[#fafafa]">{formattedDate}</span>;
 });
 
 interface ActionsCellRendererProps {
@@ -145,7 +139,7 @@ const ActionsCellRenderer = memo(function ActionsCellRenderer(params: ActionsCel
       <button
         onClick={() => params.onEditCustomer?.(customer)}
         title="Edit Customer"
-        className="p-1.5 text-amber-700 hover:text-amber-900 hover:bg-amber-50 rounded transition-colors cursor-pointer focus:outline-none"
+        className="p-1.5 text-amber-800 dark:text-amber-400 hover:bg-amber-100/80 dark:hover:bg-amber-950/60 rounded transition-colors cursor-pointer focus:outline-none"
       >
         <Pencil className="w-3.5 h-3.5" />
       </button>
@@ -153,7 +147,7 @@ const ActionsCellRenderer = memo(function ActionsCellRenderer(params: ActionsCel
       <button
         onClick={() => params.onDeleteCustomer?.(customer)}
         title="Delete Customer"
-        className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer focus:outline-none"
+        className="p-1.5 text-rose-700 dark:text-rose-400 hover:bg-rose-100/80 dark:hover:bg-rose-950/60 rounded transition-colors cursor-pointer focus:outline-none"
       >
         <Trash2 className="w-3.5 h-3.5" />
       </button>
@@ -162,9 +156,24 @@ const ActionsCellRenderer = memo(function ActionsCellRenderer(params: ActionsCel
 });
 
 export default function CustomersGrid() {
+  const { theme } = useTheme();
   const [gridApi, setGridApi] = useState<GridApi<Customer> | null>(null);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Dynamic AG Grid Theme for Light & Dark mode
+  const gridTheme = useMemo(
+    () =>
+      themeQuartz.withParams({
+        backgroundColor: theme === "dark" ? "#121215" : "#ffffff",
+        borderColor: theme === "dark" ? "#27272a" : "#eae7df",
+        headerBackgroundColor: theme === "dark" ? "#18181b" : "#f6f5f0",
+        headerTextColor: theme === "dark" ? "#fafafa" : "#181716",
+        textColor: theme === "dark" ? "#fafafa" : "#181716",
+        foregroundColor: theme === "dark" ? "#fafafa" : "#181716",
+      }),
+    [theme]
+  );
 
   // API State
   const [rowData, setRowData] = useState<Customer[]>([]);
@@ -443,16 +452,16 @@ export default function CustomersGrid() {
       {/* Live API Status / Error Info Banner */}
       <div className="flex items-center justify-between text-xs px-1">
         <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md font-medium text-[11px] ${
+          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md font-semibold text-[11px] ${
             isLiveApi 
-              ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
-              : "bg-amber-50 text-amber-800 border border-amber-200"
+              ? "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800/80" 
+              : "bg-amber-50 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 border border-amber-300/80 dark:border-amber-800/80"
           }`}>
             <Server className="w-3 h-3" />
             {isLiveApi ? "Connected to ASP.NET Core Database API (ports 5144 / 8081)" : "API Disconnected"}
           </span>
           {error && (
-            <span className="text-rose-600 flex items-center gap-1 text-[11px]">
+            <span className="text-rose-700 dark:text-rose-400 flex items-center gap-1 text-[11px] font-medium">
               <AlertCircle className="w-3 h-3" />
               {error}
             </span>
@@ -462,7 +471,7 @@ export default function CustomersGrid() {
         <button
           onClick={fetchCustomerData}
           disabled={loading}
-          className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 px-2 py-1 rounded transition-colors cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#181716] dark:text-[#fafafa] bg-[#f4f2ea] dark:bg-[#27272a] hover:bg-[#eae7df] dark:hover:bg-[#3f3f46] border border-[#dcd8ce] dark:border-[#3f3f46] px-2 py-1 rounded transition-colors cursor-pointer disabled:opacity-50"
           title="Reload Data from API"
         >
           <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} />
@@ -471,18 +480,18 @@ export default function CustomersGrid() {
       </div>
 
       {/* Grid Container */}
-      <div className="relative h-[460px] w-full rounded-lg border border-stone-200/90 overflow-hidden shadow-2xs">
+      <div className="relative h-[480px] w-full rounded-xl border border-[#eae7df] dark:border-[#27272a] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.015)] bg-white dark:bg-[#121215]">
         {/* Toolbar Controls inside Header Panel */}
         <div className="absolute top-1.5 right-2 z-10 flex flex-wrap items-center gap-2">
           {/* Quick Search Input */}
           <div className="relative flex items-center">
-            <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-[#78756e] dark:text-[#a1a1aa] absolute left-2.5 pointer-events-none" />
             <input
               type="text"
               placeholder="Quick search customers..."
               value={quickFilterText}
               onChange={(e) => setQuickFilterText(e.target.value)}
-              className="pl-8 pr-3 py-1 text-xs border border-stone-300 focus:border-stone-800 rounded-md bg-white w-44 sm:w-56 outline-none transition-all shadow-2xs placeholder:text-stone-400 text-stone-800"
+              className="pl-8 pr-3 py-1 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#fafafa] rounded-md bg-white dark:bg-[#18181b] w-44 sm:w-56 outline-none transition-all shadow-xs placeholder:text-[#9a968d] dark:placeholder:text-[#71717a] text-[#181716] dark:text-[#fafafa]"
             />
           </div>
 
@@ -491,7 +500,7 @@ export default function CustomersGrid() {
             <button
               onClick={onExportCsv}
               title="Export CSV"
-              className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+              className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
             </button>
@@ -499,10 +508,10 @@ export default function CustomersGrid() {
             <button
               onClick={onToggleFilters}
               title={showFilters ? "Hide Column Filters" : "Show Column Filters"}
-              className={`p-1.5 border rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none ${
+              className={`p-1.5 border rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none ${
                 showFilters
-                  ? "bg-stone-900 text-white border-stone-900 font-semibold"
-                  : "bg-white hover:bg-stone-100 text-stone-700 border-stone-300"
+                  ? "bg-[#181716] dark:bg-[#10b981] text-[#fbfaf7] dark:text-[#022c22] border-[#181716] dark:border-[#10b981] font-semibold"
+                  : "bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border-[#eae7df] dark:border-[#27272a]"
               }`}
             >
               <Filter className="w-3.5 h-3.5" />
@@ -511,7 +520,7 @@ export default function CustomersGrid() {
             <button
               onClick={onFitColumns}
               title="Auto-Fit Columns"
-              className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+              className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
             >
               <Maximize2 className="w-3.5 h-3.5" />
             </button>
@@ -519,23 +528,23 @@ export default function CustomersGrid() {
             <button
               onClick={onSelectAll}
               title="Select All Rows"
-              className="p-1.5 bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+              className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
             >
-              <CheckSquare className="w-3.5 h-3.5 text-stone-800" />
+              <CheckSquare className="w-3.5 h-3.5 text-[#181716] dark:text-[#fafafa]" />
             </button>
 
             <button
               onClick={onDeselectAll}
               title="Deselect All Rows"
-              className="p-1.5 bg-white hover:bg-stone-100 text-stone-500 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+              className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#78756e] dark:text-[#a1a1aa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
             >
-              <Square className="w-3.5 h-3.5 text-stone-400" />
+              <Square className="w-3.5 h-3.5 text-[#78756e] dark:text-[#a1a1aa]" />
             </button>
 
             <button
               onClick={onResetGrid}
               title="Reset Grid"
-              className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+              className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -560,77 +569,77 @@ export default function CustomersGrid() {
 
       {/* Edit Customer Modal Dialog */}
       {editingCustomer && (
-        <div className="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white rounded-xl border border-stone-200 shadow-xl max-w-lg w-full p-6 space-y-5 relative">
-            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#181716]/40 dark:bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-[#18181b] rounded-xl border border-[#eae7df] dark:border-[#27272a] shadow-xl max-w-lg w-full p-6 space-y-5 relative">
+            <div className="flex items-center justify-between border-b border-[#f4f2ea] dark:border-[#27272a] pb-3">
               <div className="flex items-center gap-2">
-                <Pencil className="w-4 h-4 text-amber-700" />
-                <h3 className="text-base font-bold text-stone-900">Edit Customer #{editFormData.Id}</h3>
+                <Pencil className="w-4 h-4 text-amber-800 dark:text-amber-400" />
+                <h3 className="text-base font-bold text-[#181716] dark:text-[#fafafa]">Edit Customer #{editFormData.Id}</h3>
               </div>
               <button
                 onClick={() => setEditingCustomer(null)}
-                className="p-1 text-stone-400 hover:text-stone-700 rounded-lg hover:bg-stone-100 transition-colors cursor-pointer"
+                className="p-1 text-[#78756e] dark:text-[#a1a1aa] hover:text-[#181716] dark:hover:text-[#fafafa] rounded-lg hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {editSuccessMsg && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-lg font-medium">
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-300 text-xs rounded-lg font-semibold">
                 {editSuccessMsg}
               </div>
             )}
 
             {editErrorMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-lg font-medium">
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/80 border border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-300 text-xs rounded-lg font-semibold">
                 {editErrorMsg}
               </div>
             )}
 
             <form onSubmit={handleUpdateSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-[#181716] dark:text-[#fafafa] uppercase tracking-wider">
                   Full Name (FName)
                 </label>
                 <div className="relative flex items-center">
-                  <User className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                  <User className="w-4 h-4 text-[#78756e] dark:text-[#a1a1aa] absolute left-3 pointer-events-none" />
                   <input
                     type="text"
                     value={editFormData.FName}
                     onChange={(e) => setEditFormData((prev) => ({ ...prev, FName: e.target.value }))}
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 rounded-lg outline-none text-stone-900"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#fafafa] rounded-lg outline-none text-[#181716] dark:text-[#fafafa] bg-white dark:bg-[#121215]"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-[#181716] dark:text-[#fafafa] uppercase tracking-wider">
                   Email Address (Email)
                 </label>
                 <div className="relative flex items-center">
-                  <Mail className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                  <Mail className="w-4 h-4 text-[#78756e] dark:text-[#a1a1aa] absolute left-3 pointer-events-none" />
                   <input
                     type="email"
                     value={editFormData.Email}
                     onChange={(e) => setEditFormData((prev) => ({ ...prev, Email: e.target.value }))}
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 rounded-lg outline-none text-stone-900"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#fafafa] rounded-lg outline-none text-[#181716] dark:text-[#fafafa] bg-white dark:bg-[#121215]"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-[#181716] dark:text-[#fafafa] uppercase tracking-wider">
                   Company Name (CName)
                 </label>
                 <div className="relative flex items-center">
-                  <Building className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                  <Building className="w-4 h-4 text-[#78756e] dark:text-[#a1a1aa] absolute left-3 pointer-events-none" />
                   <input
                     type="text"
                     value={editFormData.CName}
                     onChange={(e) => setEditFormData((prev) => ({ ...prev, CName: e.target.value }))}
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 rounded-lg outline-none text-stone-900"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#fafafa] rounded-lg outline-none text-[#181716] dark:text-[#fafafa] bg-white dark:bg-[#121215]"
                     required
                   />
                 </div>
@@ -638,15 +647,15 @@ export default function CustomersGrid() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#181716] dark:text-[#fafafa] uppercase tracking-wider">
                     Account Tier (ATier)
                   </label>
                   <div className="relative flex items-center">
-                    <Award className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                    <Award className="w-4 h-4 text-[#78756e] dark:text-[#a1a1aa] absolute left-3 pointer-events-none" />
                     <select
                       value={editFormData.ATier}
                       onChange={(e) => setEditFormData((prev) => ({ ...prev, ATier: e.target.value }))}
-                      className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 rounded-lg outline-none text-stone-900 cursor-pointer"
+                      className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#fafafa] rounded-lg outline-none text-[#181716] dark:text-[#fafafa] bg-white dark:bg-[#121215] cursor-pointer font-medium"
                     >
                       <option value="standard">standard</option>
                       <option value="enterprise">enterprise</option>
@@ -656,15 +665,15 @@ export default function CustomersGrid() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#181716] dark:text-[#fafafa] uppercase tracking-wider">
                     Status
                   </label>
                   <div className="relative flex items-center">
-                    <Activity className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                    <Activity className="w-4 h-4 text-[#78756e] dark:text-[#a1a1aa] absolute left-3 pointer-events-none" />
                     <select
                       value={editFormData.Status}
                       onChange={(e) => setEditFormData((prev) => ({ ...prev, Status: e.target.value }))}
-                      className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 rounded-lg outline-none text-stone-900 cursor-pointer"
+                      className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#fafafa] rounded-lg outline-none text-[#181716] dark:text-[#fafafa] bg-white dark:bg-[#121215] cursor-pointer font-medium"
                     >
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>
@@ -673,11 +682,11 @@ export default function CustomersGrid() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-stone-100 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-[#f4f2ea] dark:border-[#27272a] flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setEditingCustomer(null)}
-                  className="px-4 py-2 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-white dark:bg-[#121215] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -685,7 +694,7 @@ export default function CustomersGrid() {
                 <button
                   type="submit"
                   disabled={updating}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#181716] dark:bg-[#818cf8] hover:bg-[#2c2a29] dark:hover:bg-[#6366f1] text-[#fbfaf7] dark:text-[#09090b] text-xs font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-50 shadow-xs"
                 >
                   {updating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>{updating ? "Updating..." : "Update Customer"}</span>
@@ -698,25 +707,25 @@ export default function CustomersGrid() {
 
       {/* Delete Confirmation Modal */}
       {deletingCustomer && (
-        <div className="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white rounded-xl border border-stone-200 shadow-xl max-w-md w-full p-6 space-y-4 relative">
+        <div className="fixed inset-0 z-50 bg-[#181716]/40 dark:bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-[#18181b] rounded-xl border border-[#eae7df] dark:border-[#27272a] shadow-xl max-w-md w-full p-6 space-y-4 relative">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-stone-900">Delete Customer Record</h3>
-                <p className="text-xs text-stone-500 mt-0.5">
-                  Are you sure you want to delete customer <strong className="text-stone-900">{deletingCustomer.FName || deletingCustomer.name}</strong> (ID #{deletingCustomer.Id ?? deletingCustomer.id})? This will execute a SQL DELETE operation.
+                <h3 className="text-base font-bold text-[#181716] dark:text-[#fafafa]">Delete Customer Record</h3>
+                <p className="text-xs text-[#78756e] dark:text-[#a1a1aa] mt-0.5">
+                  Are you sure you want to delete customer <strong className="text-[#181716] dark:text-[#fafafa]">{deletingCustomer.FName || deletingCustomer.name}</strong> (ID #{deletingCustomer.Id ?? deletingCustomer.id})? This will execute a SQL DELETE operation.
                 </p>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-stone-100 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-[#f4f2ea] dark:border-[#27272a] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setDeletingCustomer(null)}
-                className="px-4 py-2 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+                className="px-4 py-2 bg-white dark:bg-[#121215] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] text-xs font-semibold rounded-lg transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -725,7 +734,7 @@ export default function CustomersGrid() {
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={deleting}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-50 shadow-xs"
               >
                 {deleting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>{deleting ? "Deleting..." : "Delete Customer"}</span>

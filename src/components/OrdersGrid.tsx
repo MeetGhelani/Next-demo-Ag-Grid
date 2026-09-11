@@ -23,6 +23,7 @@ import {
   Square,
   RotateCcw,
 } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
 ModuleRegistry.registerModules([
   AllCommunityModule,
@@ -36,13 +37,6 @@ type Order = {
   amount: number;
   status: string;
 };
-
-const gridTheme = themeQuartz.withParams({
-  backgroundColor: "#ffffff",
-  borderColor: "#e7e5e4",
-  headerBackgroundColor: "#f5f5f4",
-  headerTextColor: "#44403c",
-});
 
 const initialOrders: Order[] = [
   { orderId: 1001, customer: "ABC Ltd", product: "Laptop", amount: 80000, status: "Completed" },
@@ -69,7 +63,7 @@ const ActionsCellRenderer = memo(function ActionsCellRenderer(params: { data?: O
       <button
         onClick={() => alert(`Viewing Order #${params.data?.orderId}`)}
         title="View Order"
-        className="p-1.5 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors cursor-pointer focus:outline-none"
+        className="p-1.5 text-[#181716] dark:text-[#fafafa] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] rounded transition-colors cursor-pointer focus:outline-none"
       >
         <Eye className="w-3.5 h-3.5" />
       </button>
@@ -77,7 +71,7 @@ const ActionsCellRenderer = memo(function ActionsCellRenderer(params: { data?: O
       <button
         onClick={() => alert(`Editing Order #${params.data?.orderId}`)}
         title="Edit Order"
-        className="p-1.5 text-amber-700 hover:text-amber-900 hover:bg-amber-50 rounded transition-colors cursor-pointer focus:outline-none"
+        className="p-1.5 text-amber-800 dark:text-amber-400 hover:bg-amber-100/80 dark:hover:bg-amber-950/60 rounded transition-colors cursor-pointer focus:outline-none"
       >
         <Pencil className="w-3.5 h-3.5" />
       </button>
@@ -85,7 +79,7 @@ const ActionsCellRenderer = memo(function ActionsCellRenderer(params: { data?: O
       <button
         onClick={() => alert(`Deleting Order #${params.data?.orderId}`)}
         title="Delete Order"
-        className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors cursor-pointer focus:outline-none"
+        className="p-1.5 text-rose-700 dark:text-rose-400 hover:bg-rose-100/80 dark:hover:bg-rose-950/60 rounded transition-colors cursor-pointer focus:outline-none"
       >
         <Trash2 className="w-3.5 h-3.5" />
       </button>
@@ -99,12 +93,12 @@ const StatusCellRenderer = memo(function StatusCellRenderer(params: { data?: Ord
   return (
     <div className="flex items-center h-full">
       <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 h-5 rounded-full text-[11px] font-medium border leading-none ${
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 h-5.5 rounded-full text-[11px] font-semibold border leading-none shadow-2xs ${
           status === "Completed"
-            ? "bg-emerald-50/90 text-emerald-700 border-emerald-200/80"
+            ? "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 border-emerald-300/90 dark:border-emerald-800/80"
             : status === "Pending" || status === "Processing"
-            ? "bg-amber-50/90 text-amber-700 border-amber-200/80"
-            : "bg-rose-50/90 text-rose-700 border-rose-200/80"
+            ? "bg-amber-50 dark:bg-amber-950/80 text-amber-950 dark:text-amber-300 border-amber-300/90 dark:border-amber-800/80"
+            : "bg-rose-50 dark:bg-rose-950/80 text-rose-950 dark:text-rose-300 border-rose-300/90 dark:border-rose-800/80"
         }`}
       >
         <span
@@ -123,9 +117,23 @@ const StatusCellRenderer = memo(function StatusCellRenderer(params: { data?: Ord
 });
 
 export default function OrdersGrid() {
+  const { theme } = useTheme();
   const [gridApi, setGridApi] = useState<GridApi<Order> | null>(null);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+
+  const gridTheme = useMemo(
+    () =>
+      themeQuartz.withParams({
+        backgroundColor: theme === "dark" ? "#121215" : "#ffffff",
+        borderColor: theme === "dark" ? "#27272a" : "#eae7df",
+        headerBackgroundColor: theme === "dark" ? "#18181b" : "#f6f5f0",
+        headerTextColor: theme === "dark" ? "#fafafa" : "#181716",
+        textColor: theme === "dark" ? "#fafafa" : "#181716",
+        foregroundColor: theme === "dark" ? "#fafafa" : "#181716",
+      }),
+    [theme]
+  );
 
   const onGridReady = useCallback((params: GridReadyEvent<Order>) => {
     setGridApi(params.api);
@@ -215,77 +223,71 @@ export default function OrdersGrid() {
   const rowSelection = useMemo(() => ({ mode: "multiRow" as const }), []);
 
   return (
-    <div className="relative h-[480px] w-full rounded-lg border border-stone-200/90 overflow-hidden shadow-2xs">
+    <div className="relative h-[480px] w-full rounded-xl border border-[#eae7df] dark:border-[#27272a] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.015)] bg-white dark:bg-[#121215]">
       {/* Position Toolbar Controls directly inside the Row Group Drop Panel (right side) */}
       <div className="absolute top-1.5 right-2 z-10 flex flex-wrap items-center gap-2">
         {/* Quick Search Input */}
         <div className="relative flex items-center">
-          <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-[#78756e] dark:text-[#a1a1aa] absolute left-2.5 pointer-events-none" />
           <input
             type="text"
             placeholder="Quick search orders..."
             value={quickFilterText}
             onChange={(e) => setQuickFilterText(e.target.value)}
-            className="pl-8 pr-3 py-1 text-xs border border-stone-300 focus:border-stone-800 rounded-md bg-white w-44 sm:w-56 outline-none transition-all shadow-2xs placeholder:text-stone-400 text-stone-800"
+            className="pl-8 pr-3 py-1 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#fafafa] rounded-md bg-white dark:bg-[#18181b] w-44 sm:w-56 outline-none transition-all shadow-xs placeholder:text-[#9a968d] dark:placeholder:text-[#71717a] text-[#181716] dark:text-[#fafafa]"
           />
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-1">
-          {/* Export CSV / Excel */}
           <button
             onClick={onExportCsv}
             title="Export CSV / Excel"
-            className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+            className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
           </button>
 
-          {/* Toggle Column Floating Filters */}
           <button
             onClick={onToggleFilters}
             title={showFilters ? "Hide Column Filters" : "Show Column Filters"}
-            className={`p-1.5 border rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none ${
+            className={`p-1.5 border rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none ${
               showFilters
-                ? "bg-stone-900 text-white border-stone-900 font-semibold"
-                : "bg-white hover:bg-stone-100 text-stone-700 border-stone-300"
+                ? "bg-[#181716] dark:bg-[#10b981] text-[#fbfaf7] dark:text-[#022c22] border-[#181716] dark:border-[#10b981] font-semibold"
+                : "bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border-[#eae7df] dark:border-[#27272a]"
             }`}
           >
             <Filter className="w-3.5 h-3.5" />
           </button>
 
-          {/* Auto-Fit / Resize Columns */}
           <button
             onClick={onFitColumns}
             title="Auto-Fit Columns to Screen Width"
-            className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+            className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
           >
             <Maximize2 className="w-3.5 h-3.5" />
           </button>
 
-          {/* Select All Rows */}
           <button
             onClick={onSelectAll}
             title="Select All Rows"
-            className="p-1.5 bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+            className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
           >
-            <CheckSquare className="w-3.5 h-3.5 text-stone-800" />
+            <CheckSquare className="w-3.5 h-3.5 text-[#181716] dark:text-[#fafafa]" />
           </button>
 
-          {/* Deselect All Rows */}
           <button
             onClick={onDeselectAll}
             title="Deselect All Rows"
-            className="p-1.5 bg-white hover:bg-stone-100 text-stone-500 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+            className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#78756e] dark:text-[#a1a1aa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
           >
-            <Square className="w-3.5 h-3.5 text-stone-400" />
+            <Square className="w-3.5 h-3.5 text-[#78756e] dark:text-[#a1a1aa]" />
           </button>
 
-          {/* Reset Grid */}
           <button
             onClick={onResetGrid}
             title="Reset Grid Filters & Columns"
-            className="p-1.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-md transition-colors shadow-2xs cursor-pointer focus:outline-none"
+            className="p-1.5 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#181716] dark:text-[#fafafa] border border-[#eae7df] dark:border-[#27272a] rounded-md transition-colors shadow-xs cursor-pointer focus:outline-none"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>

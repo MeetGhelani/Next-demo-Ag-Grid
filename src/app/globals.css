@@ -1,14 +1,53 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+}
+
+html.dark {
+  color-scheme: dark;
+  background-color: #09090b;
+}
+
+html.dark body {
+  background-color: #09090b;
+  color: #fafafa;
+}
+
+html.dark aside {
+  background-color: #121215;
+  border-color: #27272a;
+}
+
+html.dark [aria-label="Loading data table..."] {
+  background-color: #121215;
+  border-color: #27272a;
+}
+
+/* Enable smooth transitions ONLY during active user theme toggle clicks */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, fill 300ms ease, stroke 300ms ease !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-inter), sans-serif;
-  background-color: #fafaf9;
-  color: #1c1917;
+  background-color: #fbfaf7;
+  color: #181716;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-outfit), sans-serif;
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: var(--font-outfit), var(--font-inter), sans-serif;
 }
 
 /* Custom subtle scrollbar */
@@ -22,12 +61,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d6d3d1;
+  background: #dcd8ce;
   border-radius: 3px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
+  background: #b5b0a4;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }
 
 /* Hide AG Grid Enterprise Trial Watermark */
@@ -41,3 +88,41 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none !important;
 }
 
+/* AG Grid Dark Mode Visibility & High-Contrast Text Fixes */
+.dark .ag-root-wrapper,
+.dark .ag-theme-quartz {
+  --ag-foreground-color: #fafafa;
+  --ag-secondary-foreground-color: #a1a1aa;
+  --ag-header-foreground-color: #fafafa;
+  --ag-data-color: #fafafa;
+  --ag-background-color: #121215;
+  --ag-header-background-color: #18181b;
+  --ag-row-hover-color: #1c1c21;
+  --ag-selected-row-background-color: #27272a;
+  --ag-border-color: #27272a;
+  --ag-row-border-color: #27272a;
+  color: #fafafa !important;
+}
+
+.dark .ag-cell-value,
+.dark .ag-cell {
+  color: #fafafa !important;
+}
+
+.dark .ag-header-cell-text {
+  color: #fafafa !important;
+}
+
+.dark .ag-row {
+  color: #fafafa !important;
+  background-color: #121215;
+}
+
+.dark .ag-row-hover {
+  background-color: #1c1c21 !important;
+}
+
+.dark .ag-paging-panel {
+  color: #a1a1aa !important;
+  border-top-color: #27272a !important;
+}

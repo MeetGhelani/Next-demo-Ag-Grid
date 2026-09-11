@@ -71,39 +71,39 @@ export default function AddCustomerPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/customers"
-          className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-stone-200 bg-white text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors shadow-2xs"
+          className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[#eae7df] dark:border-[#27272a] bg-white dark:bg-[#121215] text-[#55524c] dark:text-[#a1a1aa] hover:text-[#181716] dark:hover:text-[#fafafa] hover:bg-[#f4f2ea] dark:hover:bg-[#1c1c21] transition-colors shadow-2xs"
           title="Back to Customers"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-stone-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-[#181716] dark:text-[#fafafa] tracking-tight">
             Add New Customer
           </h1>
-          <p className="text-xs font-medium text-stone-500 uppercase tracking-wider">
+          <p className="text-xs font-medium text-[#78756e] dark:text-[#a1a1aa] uppercase tracking-wider">
             Save Record to ASP.NET Core SQL Database
           </p>
         </div>
       </div>
 
       {/* Form Container */}
-      <div className="rounded-xl border border-stone-200/80 bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+      <div className="rounded-xl border border-[#eae7df] dark:border-[#27272a] bg-white dark:bg-[#121215] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.015)]">
         {/* Status Alerts */}
         {successMessage && (
-          <div className="mb-6 flex items-start gap-3 p-4 rounded-lg bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-medium animate-in fade-in">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+          <div className="mb-6 flex items-start gap-3 p-4 rounded-lg bg-[#ecf4ee] dark:bg-[#142e20] border border-[#c8e2d1] dark:border-[#1e462d] text-[#22573d] dark:text-[#4ade80] text-xs font-medium animate-in fade-in">
+            <CheckCircle2 className="w-5 h-5 text-[#22573d] dark:text-[#4ade80] flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-emerald-900">Success!</p>
+              <p className="font-semibold text-[#22573d] dark:text-[#4ade80]">Success!</p>
               <p className="mt-0.5">{successMessage}</p>
             </div>
           </div>
         )}
 
         {errorMessage && (
-          <div className="mb-6 flex items-start gap-3 p-4 rounded-lg bg-rose-50 border border-rose-200/80 text-rose-800 text-xs font-medium animate-in fade-in">
-            <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+          <div className="mb-6 flex items-start gap-3 p-4 rounded-lg bg-[#fcf0f0] dark:bg-[#321414] border border-[#f5c6c6] dark:border-[#521b1b] text-[#982b2b] dark:text-[#f87171] text-xs font-medium animate-in fade-in">
+            <AlertCircle className="w-5 h-5 text-[#982b2b] dark:text-[#f87171] flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-rose-900">Error</p>
+              <p className="font-semibold text-[#982b2b] dark:text-[#f87171]">Error</p>
               <p className="mt-0.5">{errorMessage}</p>
             </div>
           </div>
@@ -113,11 +113,11 @@ export default function AddCustomerPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Customer Full Name (FName) */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                Full Name (FName) <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-[#55524c] dark:text-[#a1a1aa] uppercase tracking-wider">
+                Full Name (FName) <span className="text-[#982b2b] dark:text-[#f87171]">*</span>
               </label>
               <div className="relative flex items-center">
-                <User className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                <User className="w-4 h-4 text-[#9a968d] dark:text-[#71717a] absolute left-3 pointer-events-none" />
                 <input
                   type="text"
                   name="FName"
@@ -125,18 +125,18 @@ export default function AddCustomerPage() {
                   onChange={handleChange}
                   placeholder="e.g. Rahul Sharma"
                   required
-                  className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 rounded-lg bg-white outline-none transition-all text-stone-900 placeholder:text-stone-400"
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#10b981] rounded-lg bg-white dark:bg-[#18181b] outline-none transition-all text-[#181716] dark:text-[#fafafa] placeholder:text-[#9a968d] dark:placeholder:text-[#71717a]"
                 />
               </div>
             </div>
 
             {/* Email Address (Email) */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                Email Address (Email) <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-[#55524c] dark:text-[#a1a1aa] uppercase tracking-wider">
+                Email Address (Email) <span className="text-[#982b2b] dark:text-[#f87171]">*</span>
               </label>
               <div className="relative flex items-center">
-                <Mail className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                <Mail className="w-4 h-4 text-[#9a968d] dark:text-[#71717a] absolute left-3 pointer-events-none" />
                 <input
                   type="email"
                   name="Email"
@@ -144,18 +144,18 @@ export default function AddCustomerPage() {
                   onChange={handleChange}
                   placeholder="e.g. rahul.sharma@gmail.com"
                   required
-                  className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 rounded-lg bg-white outline-none transition-all text-stone-900 placeholder:text-stone-400"
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#10b981] rounded-lg bg-white dark:bg-[#18181b] outline-none transition-all text-[#181716] dark:text-[#fafafa] placeholder:text-[#9a968d] dark:placeholder:text-[#71717a]"
                 />
               </div>
             </div>
 
             {/* Company Name (CName) */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                Company Name (CName) <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-[#55524c] dark:text-[#a1a1aa] uppercase tracking-wider">
+                Company Name (CName) <span className="text-[#982b2b] dark:text-[#f87171]">*</span>
               </label>
               <div className="relative flex items-center">
-                <Building className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                <Building className="w-4 h-4 text-[#9a968d] dark:text-[#71717a] absolute left-3 pointer-events-none" />
                 <input
                   type="text"
                   name="CName"
@@ -163,23 +163,23 @@ export default function AddCustomerPage() {
                   onChange={handleChange}
                   placeholder="e.g. Tech Solutions Pvt Ltd"
                   required
-                  className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 rounded-lg bg-white outline-none transition-all text-stone-900 placeholder:text-stone-400"
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#10b981] rounded-lg bg-white dark:bg-[#18181b] outline-none transition-all text-[#181716] dark:text-[#fafafa] placeholder:text-[#9a968d] dark:placeholder:text-[#71717a]"
                 />
               </div>
             </div>
 
             {/* Account Tier (ATier) */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-[#55524c] dark:text-[#a1a1aa] uppercase tracking-wider">
                 Account Tier (ATier)
               </label>
               <div className="relative flex items-center">
-                <Award className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                <Award className="w-4 h-4 text-[#9a968d] dark:text-[#71717a] absolute left-3 pointer-events-none" />
                 <select
                   name="ATier"
                   value={formData.ATier}
                   onChange={handleChange}
-                  className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 rounded-lg bg-white outline-none transition-all text-stone-900 cursor-pointer"
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#10b981] rounded-lg bg-white dark:bg-[#18181b] outline-none transition-all text-[#181716] dark:text-[#fafafa] cursor-pointer"
                 >
                   <option value="standard">standard</option>
                   <option value="enterprise">enterprise</option>
@@ -190,16 +190,16 @@ export default function AddCustomerPage() {
 
             {/* Account Status (Status) */}
             <div className="space-y-1.5 md:col-span-2">
-              <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-[#55524c] dark:text-[#a1a1aa] uppercase tracking-wider">
                 Account Status (Status)
               </label>
               <div className="relative flex items-center">
-                <Activity className="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" />
+                <Activity className="w-4 h-4 text-[#9a968d] dark:text-[#71717a] absolute left-3 pointer-events-none" />
                 <select
                   name="Status"
                   value={formData.Status}
                   onChange={handleChange}
-                  className="w-full pl-9 pr-3 py-2 text-xs border border-stone-300 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 rounded-lg bg-white outline-none transition-all text-stone-900 cursor-pointer"
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-[#eae7df] dark:border-[#27272a] focus:border-[#181716] dark:focus:border-[#10b981] rounded-lg bg-white dark:bg-[#18181b] outline-none transition-all text-[#181716] dark:text-[#fafafa] cursor-pointer"
                 >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
@@ -208,10 +208,10 @@ export default function AddCustomerPage() {
             </div>
           </div>
 
-          <div className="border-t border-stone-200 pt-5 flex items-center justify-end gap-3">
+          <div className="border-t border-[#f4f2ea] dark:border-[#27272a] pt-5 flex items-center justify-end gap-3">
             <Link
               href="/customers"
-              className="px-4 py-2 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+              className="px-4 py-2 bg-white dark:bg-[#18181b] hover:bg-[#f4f2ea] dark:hover:bg-[#27272a] text-[#55524c] dark:text-[#a1a1aa] border border-[#eae7df] dark:border-[#27272a] text-xs font-medium rounded-lg transition-colors cursor-pointer"
             >
               Cancel
             </Link>
@@ -219,7 +219,7 @@ export default function AddCustomerPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 px-5 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium rounded-lg transition-colors shadow-xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-5 py-2 bg-[#181716] dark:bg-[#10b981] hover:bg-[#2c2a29] dark:hover:bg-[#059669] text-[#fbfaf7] dark:text-[#022c22] text-xs font-semibold rounded-lg transition-colors shadow-xs cursor-pointer disabled:opacity-50"
             >
               {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>{submitting ? "Saving to Database..." : "Save Customer"}</span>
